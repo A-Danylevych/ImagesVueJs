@@ -7,43 +7,49 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import DropZone from '@/components/DropZone.vue'
 import {ref} from "vue"
 import {BlobServiceClient} from "@azure/storage-blob"
 
 export default {
   name: 'HomeView',
+
   components: {
     DropZone
-},
-setup(){
-  let dropZoneFile = ref("");
+  },
 
-  const connectionString=" ";
-  const containerName = "images";
-  const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
-  const containerClient = blobServiceClient.getContainerClient(containerName);
+  data(){
+    const connectionString=" ";
+    const containerName = "images";
+    const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    return {containerClient};
+  },
 
-  const send = async (file) =>{
-    const blockBlobClient = containerClient.getBlockBlobClient(file.name);
-    await blockBlobClient.upload(file.content, file.length);
-  };
-  
-  const drop = async (e) =>{
-    const file = e.dataTransfer.files[0];
-    dropZoneFile.value = file;
-    await send(file);
-  };
+  setup(){
+    let dropZoneFile = ref(""); 
+    
+    return {dropZoneFile};
+  },
 
-  const selectedFile = async () =>{
-    const file = document.querySelector('.dropZoneFile').files[0];
-    dropZoneFile.value = file;
-    await send(file);
-  };
+  methods: {
+    async send(file){
+      const blockBlobClient = this.containerClient.getBlockBlobClient(file.name);
+      await blockBlobClient.upload(file.content, file.length);
+    },
 
-  return {dropZoneFile, drop, selectedFile};
-},
+    async drop(e){
+      const file = e.dataTransfer.files[0];
+      this.dropZoneFile.valueOf = file;
+      await this.send(file);
+    }, 
+
+    async selectedFile(){
+      const file = document.querySelector('.dropZoneFile').files[0];
+      this.dropZoneFile.valueOf = file;
+      await this.send(file);
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
