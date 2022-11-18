@@ -13,12 +13,14 @@
 import {ref} from "vue"
 export default {
   name: 'DropZone',
+  
   setup(){
     const active = ref(false);
 
     const toggleActive = () =>{
       active.value = !active.value
     };
+    
     return {active, toggleActive}
   },
 };

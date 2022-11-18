@@ -28,26 +28,26 @@ export default {
 
   setup(){
     let dropZoneFile = ref(""); 
+
+    const drop = async (e) =>{
+    const file = e.dataTransfer.files[0];
+    dropZoneFile.value = file;
+    await this.send(file);
+    };
+
+    const selectedFile = async () =>{
+    const file = document.querySelector('.dropZoneFile').files[0];
+    dropZoneFile.value = file;
+    await this.send(file);
+    };
     
-    return {dropZoneFile};
+    return {dropZoneFile, drop, selectedFile};
   },
 
   methods: {
     async send(file){
       const blockBlobClient = this.containerClient.getBlockBlobClient(file.name);
       await blockBlobClient.upload(file.content, file.length);
-    },
-
-    async drop(e){
-      const file = e.dataTransfer.files[0];
-      this.dropZoneFile.valueOf = file;
-      await this.send(file);
-    }, 
-
-    async selectedFile(){
-      const file = document.querySelector('.dropZoneFile').files[0];
-      this.dropZoneFile.valueOf = file;
-      await this.send(file);
     },
   },
 };
